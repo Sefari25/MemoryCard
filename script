@@ -1,0 +1,174 @@
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QLabel, QMessageBox, QRadioButton, QGroupBox, QButtonGroup
+from random import *
+#подключение библеотек
+
+class Question():
+    def __init__(self, question3, right_answer, wrong1, wrong2, wrong3):
+        self.question3 = question3
+        self.right_answer = right_answer
+        self.wrong1 = wrong1
+        self.wrong2 = wrong2
+        self.wrong3 = wrong3
+
+#класс коробок
+
+
+def show_result():
+    RadioGroupBox2.show()
+    RadioGroupBox.hide()
+    button.setText('Следующий вопрос')
+#меняет коробки
+
+def show_question():
+    RadioGroupBox2.hide()
+    RadioGroupBox.show()
+    button.setText('Ответить')
+    RadioButtonBox1.setExclusive(False)
+    otvet1.setChecked(False)
+    otvet2.setChecked(False)
+    otvet3.setChecked(False)
+    otvet4.setChecked(False)
+    RadioButtonBox1.setExclusive(True)
+#выключает виджеты
+
+def start_test():
+    if button.text() == 'Ответить':
+        show_result()
+    else:
+        show_question()
+#проверяет кнопку
+
+def ask(q: Question):
+    shuffle(answers)
+    answers[0].setText(q.right_answer)
+    answers[1].setText(q.wrong1)
+    answers[2].setText(q.wrong2)
+    answers[3].setText(q.wrong3)
+    question.setText(q.question3)
+    pravilniy.setText(q.right_answer)
+    show_question()
+#перемешивает и задает ответы
+
+def check_answer():
+    if answers[0].isChecked():
+        pravino_or_net.setText('Правильно')
+        main_win.score += 1
+    else:
+        pravino_or_net.setText('Неверно')
+    show_result()
+#меняет тескт на правильно/неправильно
+
+def next_question():
+    cur_question = randint(0, len(questions_list) -1)
+    q = questions_list[cur_question]
+    ask(q)
+    main_win.total += 1
+    print('-Правильных ответов:', main_win.score)
+    print('-Всего вопросов:', main_win.total)
+
+#счетчки вопросов
+
+def click_ok():
+    if button.text() == 'Ответить':
+        check_answer()
+    else:
+        next_question()
+#менят коробки
+
+app = QApplication([])
+main_win = QWidget()
+main_win.cur_question = -1
+main_win.setWindowTitle('Memory Card')
+question = QLabel('Какой национальности не существует?')
+button = QPushButton('Ответить')
+RadioGroupBox = QGroupBox('Варианты ответов')
+otvet1 = QRadioButton('Энцы')
+otvet2 = QRadioButton('Смурфы')
+otvet3 = QRadioButton('Чумыльцы')
+otvet4 = QRadioButton('Алеуты')
+layout_ans1 = QHBoxLayout()
+layout_ans2 = QVBoxLayout()
+layout_ans3 = QVBoxLayout()
+#создание коробки и подключение линий к ней
+
+answers = [otvet1, otvet2, otvet3, otvet4]
+
+
+main_win.score = 0
+main_win.total = 0
+
+RadioButtonBox1 = QButtonGroup()
+RadioButtonBox1.addButton(otvet1)
+RadioButtonBox1.addButton(otvet2)
+RadioButtonBox1.addButton(otvet3)
+RadioButtonBox1.addButton(otvet4)
+
+layout_ans2.addWidget(otvet1)
+layout_ans2.addWidget(otvet2)
+layout_ans3.addWidget(otvet3)
+layout_ans3.addWidget(otvet4)
+layout_ans1.addLayout(layout_ans2)
+layout_ans1.addLayout(layout_ans3)
+#добавление линий
+
+RadioGroupBox.setLayout(layout_ans1)
+
+question2 = QLabel('Самый сложный вопрос в мире')
+RadioGroupBox2 = QGroupBox('Результат теста')
+pravino_or_net = QLabel('Правильно/Неправильно')
+pravilniy = QLabel('Правильный ответ')
+layout2_ans1 = QVBoxLayout()
+layout2_ans2 = QVBoxLayout()
+layout2_ans1.addWidget(pravino_or_net)
+layout2_ans1.addWidget(pravilniy)
+layout2_ans2.addLayout(layout2_ans1)
+#создание второй коробки
+
+RadioGroupBox2.setLayout(layout2_ans2)
+
+RadioGroupBox2.hide()
+#скрытие одной из коробок
+
+layout_ans4 = QHBoxLayout()
+layout_ans5 = QHBoxLayout()
+layout_ans6 = QHBoxLayout()
+layout_ans4.addWidget(question, alignment = Qt.AlignCenter)
+layout_ans5.addWidget(RadioGroupBox, alignment = Qt.AlignCenter)
+layout_ans5.addWidget(RadioGroupBox2, alignment = Qt.AlignCenter)
+layout_ans6.addWidget(button, alignment = Qt.AlignCenter)
+layout_main = QVBoxLayout()
+layout_main.addLayout(layout_ans4)
+layout_main.addLayout(layout_ans5)
+layout_main.addLayout(layout_ans6)
+main_win.setLayout(layout_main)
+#добавление основных линий
+
+button.clicked.connect(click_ok)
+
+questions_list = []
+questions_list.append(Question('Сколько планет в солнечной системе', '8', '7', '9', '5'))
+questions_list.append(Question('Государственный язык бразилии', 'Португальский', 'Испанский', 'Английский', 'Бразильский'))
+questions_list.append(Question('Какой национальности не существует', 'Смурфы', 'Энцы', 'Чумыльцы', 'Алеуты'))
+questions_list.append(Question('Государственный язык Японии', 'Японский', 'Корейский', 'Китайский', 'Английский'))
+questions_list.append(Question('В какой стране государственный язык является Арабским', 'Египет', 'Турция', 'Иран', 'Индонезия'))
+questions_list.append(Question('В какой стране говорят на языке Суахили', 'Кения', 'Нигерия', 'Марокко', 'ЮАР'))
+questions_list.append(Question('В какой стране говорят на языке Хинди', 'Индия', 'Пакистан', 'Непал', 'Бангладеш'))
+questions_list.append(Question('Какой язык является оффициальным в Аргентине', 'Испанский', 'Португальский', 'Итальянский', 'Французкий'))
+questions_list.append(Question('В какой стране говорят на языке Тамиль', 'Все', 'Шри-Ланка', 'Индия', 'Непал'))
+questions_list.append(Question('Какой государственный язык в Филиппинах', 'Тагальский', 'Испанский', 'Китайский', 'Английский'))
+
+
+
+
+
+
+
+
+#вопросы
+
+
+
+
+main_win.show()
+app.exec_()
